@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,pycharm,pycharm+all,pycharm+iml,python,flask
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,pycharm,pycharm+all,pycharm+iml,python,flask
 
+### private informaion ###
+*.json
+
+
 ### Flask ###
 instance/*
 !instance/.gitignore

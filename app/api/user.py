@@ -25,6 +25,12 @@ user_file_parser.add_argument('profile_image', type=FileStorage, location='files
 1. 현재 회원가입 관련해서는 URL에 비밀번호가 노출되는 문제가 발생
    URL에 안 보이게 해야할 것으로 생각
    JSON 양식으로 하게 되면 Parser의 형태를 바꾸긴 해야할 것으로 생각
+   JWT 도입 고려
+2. 현재는 User Model 기반이 아닌 form-data URL을 통해서 Parser가 동작
+   해당 부분에 대해서 User Model을 사용하는 게 바람직하다고 생각함
+   그렇게 될 경우 File 받는 부분에 대해서 수정이 필요
+   ⇒ 로직의 변화 필요
+   File 받는 부분만 따로 분리할 것 인지 / 같이 진해할 것 인지 고려
 """
 
 

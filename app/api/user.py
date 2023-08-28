@@ -2,7 +2,9 @@ from flask_restx import Resource, Namespace, reqparse
 from flask import request, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+
 import os
+import shutil
 
 from app import api
 from app.models import user_model
@@ -66,7 +68,7 @@ class UsersResource(Resource):
             }
             user_list.append(user_dict)
 
-        return {'users': user_list}
+        return {'users': user_list}, 200
 
 
 @user_ns.route('/<string:user_email>')
@@ -104,6 +106,8 @@ class UserResource(Resource):
         user_query = "SELECT id FROM users WHERE email = %s"
         cursor.execute(user_query, (user_email,))
         existing_user = cursor.fetchone()
+        if new_email == user_email:
+            return {'message': 'User can not change email address'}, 400
 
         if existing_user:
             # 사용자 정보 업데이트
@@ -116,6 +120,36 @@ class UserResource(Resource):
             return {'message': 'User information updated successfully'}, 200
         else:
             return {'message': 'User does not exist'}, 400
+
+    def delete(self, user_email):
+        """
+            특정 이메일을 통해 유저 삭제
+        """
+        query = "SELECT id, name, email FROM users WHERE email = %s"
+        cursor.execute(query, (user_email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            user = {
+                'id': existing_user[0],
+                'name': existing_user[1],
+                'email': existing_user[2],
+            }
+
+            delete_profile_dir = os.path.join("app", "profile_image", user['email'])
+            shutil.rmtree(delete_profile_dir)
+
+            delete_profile_query = "DELETE FROM profile WHERE email = %s"
+            cursor.execute(delete_profile_query, (user_email,))
+
+            delete_user_query = "DELETE FROM users WHERE email = %s"
+            cursor.execute(delete_user_query, (user_email,))
+            db.commit()
+
+            return {'message': 'User deleted successfully'}, 200
+
+        else:
+            return {'message': 'User not found'}, 404
 
 
 @user_ns.route('/<string:user_email>/profile')
@@ -170,13 +204,13 @@ class ProfileResource(Resource):
 
             if profile_image:
                 filename = secure_filename(profile_image.filename)
-                upload_dir = os.path.join("app", "profile_image", user['name'])
+                upload_dir = os.path.join("app", "profile_image", user['email'])
                 os.makedirs(upload_dir, exist_ok=True)
                 upload_path = os.path.join(upload_dir, filename)
                 profile_image.save(upload_path)
-                profile_image_db_path = os.path.join("profile_image", user['name'], filename)
+                profile_image_db_path = os.path.join("profile_image", user['email'], filename)
             else:
-                profile_image_db_path = None
+                return {'message': 'No profile image provided'}, 400
 
         else:
             return {'message': 'User not found'}, 404
@@ -189,12 +223,72 @@ class ProfileResource(Resource):
 
         return {'message': 'User profile image registered successfully'}, 201
 
+    @user_ns.expect(user_file_parser, validate=True)
     def put(self, user_email):
         """
             특정 이메일을 통해 유저 프로필 이미지 수정
         """
+        profile_image = user_file_parser.parse_args()['profile_image']
+
+        # Check if user with given email already exists
+        user_query = "SELECT id, name, email FROM users WHERE email = %s"
+        cursor.execute(user_query, (user_email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            user = {
+                'id': existing_user[0],
+                'name': existing_user[1],
+                'email': existing_user[2],
+            }
+
+            if profile_image:
+                filename = secure_filename(profile_image.filename)
+                upload_dir = os.path.join("app", "profile_image", user['email'])
+                os.makedirs(upload_dir, exist_ok=True)
+                upload_path = os.path.join(upload_dir, filename)
+                profile_image.save(upload_path)
+                profile_image_db_path = os.path.join("profile_image", user['email'], filename)
+            else:
+                return {'message': 'No profile image provided'}, 400
+        else:
+            return {'message': 'User not found'}, 404
+
+        # 사용자 프로필 이미지 데이터베이스에 업데이트
+        update_query = "UPDATE profile SET src = %s WHERE email = %s"
+        cursor.execute(update_query, (profile_image_db_path, user['email']))
+        db.commit()
+
+        return {'message': 'Profile image updated successfully'}, 200
 
     def delete(self, user_email):
         """
             특정 이메일을 통해 유저 프로필 이미지 삭제
         """
+        # Check if user with given email already exists
+        user_query = "SELECT id, name, email FROM users WHERE email = %s"
+        cursor.execute(user_query, (user_email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            user = {
+                'id': existing_user[0],
+                'name': existing_user[1],
+                'email': existing_user[2],
+            }
+
+            profile_query = "SELECT id, email, src FROM profile WHERE email = %s"
+            cursor.execute(profile_query, (user['email'],))
+            profile = cursor.fetchone()
+
+            if profile:
+                remove_img_query = "UPDATE profile SET src = NULL WHERE email = %s"
+                cursor.execute(remove_img_query, (user['email'],))
+                db.commit()
+                return {'message': 'Profile image removed successfully'}, 200
+
+            else:
+                return {'message': 'No profile image in Database'}, 400
+
+        else:
+            return {'message': 'User not found'}, 404

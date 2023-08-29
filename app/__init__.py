@@ -2,12 +2,14 @@ from flask import Flask
 from flask_restx import Api, Resource, reqparse, Namespace
 from app.databases import db, cursor
 from .api.user import user_ns
+from .api.activity import activity_ns
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='MoWA API Document', description='Check the REST API specification of MoWA.')
 
 # API에 네임스페이스 추가
 api.add_namespace(user_ns)
+api.add_namespace(activity_ns)
 
 
 if __name__ == '__main__':

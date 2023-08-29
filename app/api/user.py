@@ -11,9 +11,9 @@ from app.models import user_model
 from app.databases import db, cursor
 
 # 네임스페이스 생성
-user_ns = Namespace('user', description='사용자 관련 기능', doc='/user', path='/user')
+user_ns = Namespace('User', description='사용자 관련 기능', doc='/user', path='/user')
 
-user_filed = user_ns.model('UserModel', user_model)
+user_field = user_ns.model('UserModel', user_model)
 
 user_file_parser = reqparse.RequestParser()
 user_file_parser.add_argument('profile_image', type=FileStorage, location='files')
@@ -21,7 +21,7 @@ user_file_parser.add_argument('profile_image', type=FileStorage, location='files
 
 @user_ns.route('/signup')
 class SignupResource(Resource):
-    @user_ns.expect(user_filed, validate=True)
+    @user_ns.expect(user_field, validate=True)
     def post(self):
         """
             유저 등록
@@ -92,7 +92,7 @@ class UserResource(Resource):
         else:
             return {'message': 'User not found'}, 404
 
-    @user_ns.expect(user_filed, validate=True)
+    @user_ns.expect(user_field, validate=True)
     def put(self, user_email):
         """
             특정 이메일을 통해 유저 정보 수정

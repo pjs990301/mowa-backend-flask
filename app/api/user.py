@@ -1,294 +1,114 @@
 from flask_restx import Resource, Namespace, reqparse
-from flask import request, send_file
-from werkzeug.utils import secure_filename
-from werkzeug.datastructures import FileStorage
+from flask import request
 
 import os
-import shutil
 
 from app import api
-from app.models import user_model
+from app.models import activity_model
 from app.databases import db, cursor
 
-# 네임스페이스 생성
-user_ns = Namespace('User', description='사용자 관련 기능', doc='/user', path='/user')
+activity_ns = Namespace('Activity', description='활동 통계 관련 기능', doc='/activity', path='/activity')
 
-user_field = user_ns.model('UserModel', user_model)
-
-user_file_parser = reqparse.RequestParser()
-user_file_parser.add_argument('profile_image', type=FileStorage, location='files')
+activity_field = activity_ns.model('ActivityModel', activity_model)
 
 
-@user_ns.route('/signup')
-class SignupResource(Resource):
-    @user_ns.expect(user_field, validate=True)
-    def post(self):
-        """
-            유저 등록
-        """
-        data = request.json
-        name = data['name']
-        email = data['email']
-        password = data['password']
-
-        # Check if user with given email already exists
-        user_query = "SELECT id FROM users WHERE email = %s"
-        cursor.execute(user_query, (email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            return {'message': 'User with this email already exists'}, 400
-
-        # 사용자 정보 데이터베이스에 저장
-        query = "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)"
-        values = (name, email, password)
-        cursor.execute(query, values)
-        db.commit()
-
-        return {'message': 'User registered successfully'}, 201
-
-
-@user_ns.route('/users')
-class UsersResource(Resource):
+@activity_ns.route('/')
+class ActivityResource(Resource):
     def get(self):
         """
-            모든 유저 조회
+            모든 유저의 활동 조회
         """
-        # 데이터베이스에서 모든 사용자 정보 조회
-        query = "SELECT id, name, email FROM users"
+        query = "SELECT email, date, warning_count, activity_count, fall_count FROM activity"
         cursor.execute(query)
-        users = cursor.fetchall()
+        activitys = cursor.fetchall()
+        activity_list = []
 
-        user_list = []
-        for user in users:
-            user_dict = {
-                'id': user[0],
-                'name': user[1],
-                'email': user[2],
+        for activity in activitys:
+            activity_dict = {
+                'email': activity[0],
+                'date': activity[1].strftime('%Y-%m-%d'),
+                'warning_count': activity[2],
+                'activity_count': activity[3],
+                'fall_count': activity[4],
             }
-            user_list.append(user_dict)
+            activity_list.append(activity_dict)
 
-        return {'users': user_list}, 200
+        return {'activitys': activity_list}, 200
 
-
-@user_ns.route('/<string:user_email>')
-class UserResource(Resource):
-    def get(self, user_email):
+    @activity_ns.expect(activity_field, validate=True)
+    def post(self):
         """
-            특정 이메일을 통해 유저 조회
-        """
-        # 주어진 이메일로 데이터베이스에서 사용자 정보 조회
-        query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(query, (user_email,))
-        user = cursor.fetchone()
-
-        if user:
-            user_dict = {
-                'id': user[0],
-                'name': user[1],
-                'email': user[2],
-            }
-            return user_dict
-        else:
-            return {'message': 'User not found'}, 404
-
-    @user_ns.expect(user_field, validate=True)
-    def put(self, user_email):
-        """
-            특정 이메일을 통해 유저 정보 수정
+            유저의 활동 정보 추가
         """
         data = request.json
-        new_name = data['name']
-        new_email = data['email']
-        new_password = data['password']
+        email = data['email']
+        date = data['date']
+        warning_count = data['warning_count']
+        activity_count = data['activity_count']
+        fall_count = data['fall_count']
 
-        # 주어진 이메일로 기존 유저가 존재하는지 확인합니다.
-        user_query = "SELECT id FROM users WHERE email = %s"
-        cursor.execute(user_query, (user_email,))
-        existing_user = cursor.fetchone()
-        if new_email == user_email:
-            return {'message': 'User can not change email address'}, 400
+        fetch_id_query = "SELECT id FROM users WHERE email = %s"
+        cursor.execute(fetch_id_query, (email,))
+        user_id_result = cursor.fetchone()
 
-        if existing_user:
-            # 사용자 정보 업데이트
-            update_query = "UPDATE users SET name = %s, email = %s, password = %s WHERE email = %s"
-            update_values = (new_name, new_email, new_password, user_email)
+        # Check if user exists with the given email
+        if not user_id_result:
+            return {"error": "User not found with the provided email."}, 404
 
-            cursor.execute(update_query, update_values)
-            db.commit()
+        query = ("INSERT INTO activity (id, email, date, warning_count, activity_count, fall_count) "
+                 "VALUES (%s, %s, %s ,%s, %s, %s)")
+        cursor.execute(query, (user_id_result[0], email, date, warning_count, activity_count, fall_count))
+        db.commit()
 
-            return {'message': 'User information updated successfully'}, 200
-        else:
-            return {'message': 'User does not exist'}, 400
-
-    def delete(self, user_email):
-        """
-            특정 이메일을 통해 유저 삭제
-        """
-        query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(query, (user_email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            user = {
-                'id': existing_user[0],
-                'name': existing_user[1],
-                'email': existing_user[2],
-            }
-
-            delete_profile_dir = os.path.join("app", "profile_image", user['email'])
-            shutil.rmtree(delete_profile_dir)
-
-            delete_profile_query = "DELETE FROM profile WHERE email = %s"
-            cursor.execute(delete_profile_query, (user_email,))
-
-            delete_user_query = "DELETE FROM users WHERE email = %s"
-            cursor.execute(delete_user_query, (user_email,))
-            db.commit()
-
-            return {'message': 'User deleted successfully'}, 200
-
-        else:
-            return {'message': 'User not found'}, 404
+        return {"message": "Activity data added successfully."}, 201
 
 
-@user_ns.route('/<string:user_email>/profile')
-class ProfileResource(Resource):
+@activity_ns.route('/<string:user_email>')
+class ActivityUserResource(Resource):
     def get(self, user_email):
         """
-            특정 이메일을 통해 유저 프로필 이미지 조회
+            특정 이메일을 통해 유저 활동 목록 조회
         """
 
-        user_query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(user_query, (user_email,))
-        existing_user = cursor.fetchone()
+        query = "SELECT date, warning_count,  activity_count, fall_count FROM activity WHERE email = %s"
+        cursor.execute(query, (user_email,))
+        activitys = cursor.fetchall()
+        activity_list = []
 
-        if existing_user:
-            user = {
-                'id': existing_user[0],
-                'name': existing_user[1],
-                'email': existing_user[2],
+        for activity in activitys:
+            activity_dict = {
+                'date': activity[0].strftime('%Y-%m-%d'),
+                'warning_count': activity[1],
+                'activity_count': activity[2],
+                'fall_count': activity[3],
             }
+            activity_list.append(activity_dict)
+        return {'activitys': activity_list}, 200
 
-            profile_query = "SELECT id, email, src FROM profile WHERE email = %s"
-            cursor.execute(profile_query, (user['email'],))
-            profile = cursor.fetchone()
 
-            if profile:
-                return send_file(profile[2], mimetype='image/jpeg')
-
-            else:
-                return {'message': 'User profile image not found'}, 400
-
-        else:
-            return {'message': 'User not found'}, 404
-
-    @user_ns.expect(user_file_parser, validate=True)
-    def post(self, user_email):
+@activity_ns.route('/<string:user_email>/stats/<int:year>/<int:month>')
+class ActivityUserStatsResource(Resource):
+    def get(self, user_email, year, month):
         """
-            특정 이메일을 통해 유저 프로필 이미지 추가
+            특정 이메일, 년월을 통해 유저 활동 통계 조회
         """
-        profile_image = user_file_parser.parse_args()['profile_image']
+        query = ("SELECT YEAR(date) AS year, MONTH(date) AS month, email, "
+                 "SUM(warning_count) AS warning_count, "
+                 "SUM(activity_count) AS activity_count, "
+                 "SUM(fall_count) AS fall_count "
+                 "FROM activity "
+                 "WHERE email = %s and  YEAR(date)=%s and MONTH(date)=%s "
+                 "GROUP BY YEAR(date), MONTH(date), email")
 
-        # Check if user with given email already exists
-        user_query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(user_query, (user_email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            user = {
-                'id': existing_user[0],
-                'name': existing_user[1],
-                'email': existing_user[2],
+        cursor.execute(query, (user_email, year, month))
+        activitys = cursor.fetchone()
+        if activitys:
+            activity_stats = {
+                'email': activitys[2],
+                'warning_count': int(activitys[3]),
+                'activity_count': int(activitys[4]),
+                'fall_count': int(activitys[5])
             }
-
-            if profile_image:
-                filename = secure_filename(profile_image.filename)
-                upload_dir = os.path.join("app", "profile_image", user['email'])
-                os.makedirs(upload_dir, exist_ok=True)
-                upload_path = os.path.join(upload_dir, filename)
-                profile_image.save(upload_path)
-                profile_image_db_path = os.path.join("profile_image", user['email'], filename)
-            else:
-                return {'message': 'No profile image provided'}, 400
-
+            return activity_stats
         else:
-            return {'message': 'User not found'}, 404
-
-        # 사용자 프로필 이미지 데이터베이스에 저장
-        query = "INSERT INTO profile (id, email, src) VALUES (%s, %s, %s)"
-        values = (user['id'], user['email'], profile_image_db_path)
-        cursor.execute(query, values)
-        db.commit()
-
-        return {'message': 'User profile image registered successfully'}, 201
-
-    @user_ns.expect(user_file_parser, validate=True)
-    def put(self, user_email):
-        """
-            특정 이메일을 통해 유저 프로필 이미지 수정
-        """
-        profile_image = user_file_parser.parse_args()['profile_image']
-
-        # Check if user with given email already exists
-        user_query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(user_query, (user_email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            user = {
-                'id': existing_user[0],
-                'name': existing_user[1],
-                'email': existing_user[2],
-            }
-
-            if profile_image:
-                filename = secure_filename(profile_image.filename)
-                upload_dir = os.path.join("app", "profile_image", user['email'])
-                os.makedirs(upload_dir, exist_ok=True)
-                upload_path = os.path.join(upload_dir, filename)
-                profile_image.save(upload_path)
-                profile_image_db_path = os.path.join("profile_image", user['email'], filename)
-            else:
-                return {'message': 'No profile image provided'}, 400
-        else:
-            return {'message': 'User not found'}, 404
-
-        # 사용자 프로필 이미지 데이터베이스에 업데이트
-        update_query = "UPDATE profile SET src = %s WHERE email = %s"
-        cursor.execute(update_query, (profile_image_db_path, user['email']))
-        db.commit()
-
-        return {'message': 'Profile image updated successfully'}, 200
-
-    def delete(self, user_email):
-        """
-            특정 이메일을 통해 유저 프로필 이미지 삭제
-        """
-        # Check if user with given email already exists
-        user_query = "SELECT id, name, email FROM users WHERE email = %s"
-        cursor.execute(user_query, (user_email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            user = {
-                'id': existing_user[0],
-                'name': existing_user[1],
-                'email': existing_user[2],
-            }
-
-            profile_query = "SELECT id, email, src FROM profile WHERE email = %s"
-            cursor.execute(profile_query, (user['email'],))
-            profile = cursor.fetchone()
-
-            if profile:
-                remove_img_query = "UPDATE profile SET src = NULL WHERE email = %s"
-                cursor.execute(remove_img_query, (user['email'],))
-                db.commit()
-                return {'message': 'Profile image removed successfully'}, 200
-
-            else:
-                return {'message': 'No profile image in Database'}, 400
-
-        else:
-            return {'message': 'User not found'}, 404
+            return {'message': 'Activitys not found'}, 404

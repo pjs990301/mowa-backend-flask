@@ -1,6 +1,7 @@
 from flask_restx import Resource, Namespace, reqparse
 from flask import request
 
+from datetime import datetime
 import os
 
 from app import api
@@ -53,7 +54,7 @@ class ActivityResource(Resource):
 
         # Check if user exists with the given email
         if not user_id_result:
-            return {"error": "User not found with the provided email."}, 404
+            return {"message": "User not found with the provided email."}, 404
 
         query = ("INSERT INTO activity (id, email, date, warning_count, activity_count, fall_count) "
                  "VALUES (%s, %s, %s ,%s, %s, %s)")
@@ -97,7 +98,7 @@ class ActivityUserStatsResource(Resource):
                  "SUM(activity_count) AS activity_count, "
                  "SUM(fall_count) AS fall_count "
                  "FROM activity "
-                 "WHERE email = %s and  YEAR(date)=%s and MONTH(date)=%s "
+                 "WHERE email = %s and YEAR(date)=%s and MONTH(date)=%s "
                  "GROUP BY YEAR(date), MONTH(date), email")
 
         cursor.execute(query, (user_email, year, month))
@@ -111,4 +112,50 @@ class ActivityUserStatsResource(Resource):
             }
             return activity_stats
         else:
-            return {'message': 'Activitys not found'}, 404
+            return {'message': 'Activitys not found.'}, 404
+
+
+@activity_ns.route('/check/<string:user_email>')
+class ActivityCheckResource(Resource):
+    def post(self, user_email):
+        """
+            오늘 날짜의 데이터(행)가 없으면 새로운 데이터(행) 생성
+        """
+        query = "SELECT * FROM activity WHERE email = %s AND date = %s"
+        cursor.execute(query, (user_email, datetime.now().date()))
+        existing_entry = cursor.fetchone()
+
+        if not existing_entry:
+            fetch_id_query = "SELECT id FROM users WHERE email = %s"
+            cursor.execute(fetch_id_query, (user_email,))
+            user_id_result = cursor.fetchone()
+
+            # Check if user exists with the given email
+            if not user_id_result:
+                return {"message": "User not found with the provided email."}, 404
+
+            else:
+                insert_query = ("INSERT INTO activity (id, email, date, warning_count, activity_count, fall_count)  "
+                                "VALUES (%s, %s,%s, %s,%s, %s)")
+                cursor.execute(insert_query, (user_id_result[0], user_email, datetime.now().date(), 0, 0, 0))
+                db.commit()
+                return {"message": "New entry created for the date."}, 201
+
+        else:
+            return {'message': 'Data already exists for the date.'}, 200
+
+
+# @activity_ns.route('/<string:user_email>/<int:year>/<int:month>/<int:day>')
+# class ActivityDetailResource(Resource):
+#     def get(self, user_email, year, month, day):
+#         """
+#             특정 이메일의 년월일을 통해서 활동 조회
+#         """
+#         query = ("SELECT * FROM activity "
+#                  "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
+#         cursor.execute(query, (user_email, year, month, day))
+#         activity = cursor.fetchone()
+#         if activity :
+#             activity_stats = {
+#
+#             }

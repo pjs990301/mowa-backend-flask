@@ -2,6 +2,7 @@ from flask_restx import Resource, Namespace, reqparse
 from flask import request, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+from flask_jwt_extended import create_access_token, jwt_required
 
 import os
 import shutil
@@ -45,7 +46,32 @@ class SignupResource(Resource):
         cursor.execute(query, values)
         db.commit()
 
-        return {'message': 'User registered successfully'}, 201
+        user_id = cursor.lastrowid
+        access_token = create_access_token(identity=user_id)
+
+        return {'message': 'User registered successfully', 'access_token': access_token}, 201
+
+
+@user_ns.route('/login')
+class LoginResource(Resource):
+    @user_ns.expect(user_field, validate=True)
+    def post(self):
+        """
+            유저 로그인
+        """
+        data = request.json
+        email = data['email']
+        password = data['password']
+
+        query = "SELECT * FROM users WHERE email = %s"
+        cursor.execute(query, (email,))
+        user = cursor.fetchone()
+        if not user or user[2] != password:
+            return {'message': 'Bad credentials'}, 401
+
+        access_token = create_access_token(identity=user[0])
+
+        return {'access_token': access_token}, 200
 
 
 @user_ns.route('/users')
@@ -154,6 +180,7 @@ class UserResource(Resource):
 
 @user_ns.route('/<string:user_email>/profile')
 class ProfileResource(Resource):
+    # @jwt_required()
     def get(self, user_email):
         """
             특정 이메일을 통해 유저 프로필 이미지 조회

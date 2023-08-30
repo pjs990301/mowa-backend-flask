@@ -136,17 +136,17 @@ class UserResource(Resource):
                 'email': existing_user[2],
             }
 
-            delete_profile_dir = os.path.join("app", "profile_image", user['email'])
-            shutil.rmtree(delete_profile_dir)
+            try:
+                delete_profile_dir = os.path.join("app", "profile_image", user['email'])
+                shutil.rmtree(delete_profile_dir)
 
-            delete_profile_query = "DELETE FROM profile WHERE email = %s"
-            cursor.execute(delete_profile_query, (user_email,))
+            finally:
+                # 데이터베이스 ON DELETE CASCADE 옵션 설정
+                delete_user_query = "DELETE FROM users WHERE email = %s"
+                cursor.execute(delete_user_query, (user_email,))
+                db.commit()
 
-            delete_user_query = "DELETE FROM users WHERE email = %s"
-            cursor.execute(delete_user_query, (user_email,))
-            db.commit()
-
-            return {'message': 'User deleted successfully'}, 200
+                return {'message': 'User deleted successfully'}, 200
 
         else:
             return {'message': 'User not found'}, 404
@@ -201,6 +201,11 @@ class ProfileResource(Resource):
                 'name': existing_user[1],
                 'email': existing_user[2],
             }
+            profile_query = "SELECT id FROM profile WHERE email = %s"
+            cursor.execute(profile_query, (user['email'],))
+            profile = cursor.fetchone()
+            if profile:
+                return {'message': 'User profile with this email already exists'}, 400
 
             if profile_image:
                 filename = secure_filename(profile_image.filename)

@@ -180,7 +180,8 @@ class UserResource(Resource):
 
 @user_ns.route('/<string:user_email>/profile')
 class ProfileResource(Resource):
-    # @jwt_required()
+    @user_ns.doc(security='Bearer Auth')
+    @jwt_required()
     def get(self, user_email):
         """
             특정 이메일을 통해 유저 프로필 이미지 조회

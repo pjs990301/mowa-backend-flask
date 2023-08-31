@@ -207,6 +207,52 @@ class ActivityDetailResource1(Resource):
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500
 
+    @activity_ns.expect(activity_field, validate=True)
+    def put(self, user_email, year, month, day):
+        """
+            특정 이메일과 년월일을 통해서 활동 수정
+        """
+        try:
+            if not request.is_json:
+                return {"message": "Missing JSON in request."}, 400
+
+            data = request.json
+
+            if 'email' not in data or 'date' not in data:
+                return {"message": "Missing 'email' or 'date' in JSON data."}, 400
+
+            if data['email'] != user_email:
+                return {"message": "Mismatch between 'email' in JSON and 'user_email' in path."}, 400
+
+            json_date = datetime.strptime(data['date'], "%Y-%m-%d").date()
+            if json_date.year != year or json_date.month != month or json_date.day != day:
+                return {"message": "Mismatch between 'date' in JSON and year/month/day in path."}, 400
+
+            required_keys = ['warning_count', 'activity_count', 'fall_count']
+            if not all(key in data for key in required_keys):
+                return {"message": "Missing required fields."}, 400
+
+            warning_count = data['warning_count']
+            activity_count = data['activity_count']
+            fall_count = data['fall_count']
+
+            query = ("UPDATE activity SET warning_count = %s, activity_count = %s, fall_count = %s "
+                     "WHERE email = %s AND year(date)=%s and month(date)=%s and day(date)=%s;")
+
+            cursor.execute(query, (warning_count, activity_count, fall_count, user_email, year, month, day))
+            db.commit()
+
+            updated_rows = cursor.rowcount
+
+            if updated_rows == 0:
+                return {'message': 'No data found for the given email and date.'}, 404
+
+            else:
+                return {'message': 'Activity data updated successfully.'}, 200
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
 
 @activity_ns.route('/<string:user_email>/<int:year>/<int:month>')
 class ActivityDetailResource2(Resource):
@@ -233,44 +279,6 @@ class ActivityDetailResource2(Resource):
                 }
                 activity_list.append(activity_dict)
             return {'activitys': activity_list}, 200
-
-        except pymysql.Error as e:
-            return {"message": "Database error: {}".format(e)}, 500
-
-
-@activity_ns.route('/<string:user_email>/<int:year>/<int:month>')
-class ActivityDateUpdateResource(Resource):
-    def put(self, user_email, year, month, day):
-        """
-            특정 이메일과 년월일을 통해서 활동 수정
-        """
-        try:
-            if not request.is_json:
-                return {"message": "Missing JSON in request."}, 400
-
-            data = request.json
-
-            required_keys = ['warning_count', 'activity_count', 'fall_count']
-            if not all(key in data for key in required_keys):
-                return {"message": "Missing required fields."}, 400
-
-            warning_count = data['warning_count']
-            activity_count = data['activity_count']
-            fall_count = data['fall_count']
-
-            query = ("UPDATE activity SET warning_count = %s, activity_count = %s, fall_count = %s "
-                     "WHERE email = %s AND year(date)=%s and month(date)=%s and day(date)=%s;")
-
-            cursor.execute(query, (warning_count, activity_count, fall_count, user_email, year, month, day))
-            db.commit()
-
-            updated_roews = cursor.rowcount
-
-            if updated_roews == 0:
-                return {'message': 'No data found for the given email and date.'}, 404
-
-            else:
-                return {'message': 'Activity data updated successfully.'}, 200
 
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500

@@ -282,3 +282,30 @@ class ActivityDetailResource2(Resource):
 
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500
+
+
+@activity_ns.route('/fall/<string:user_email>/<int:year>/<int:month>/<int:day>')
+class ActivityFallDetectionResource(Resource):
+    def put(self, user_email, year, month, day):
+        """
+            Fall 감지시 특정 이메일과 년월일을 통해서 Fall count 수정
+        """
+        try:
+            query = ("SELECT fall_count FROM activity "
+                     "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
+            cursor.execute(query, (user_email, year, month, day))
+            result = cursor.fetchone()
+
+            if not result:
+                return {"message": "No activity data found for the given email and date."}, 404
+
+            new_fall_count = result[0] + 1
+
+            update_query = ("UPDATE activity SET fall_count = %s "
+                            "WHERE email = %s AND YEAR(date) = %s AND MONTH(date) = %s AND DAY(date) = %s")
+            cursor.execute(update_query, (new_fall_count, user_email, year, month, day))
+            db.commit()
+            return {"message": "Fall count updated successfully."}, 200
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500

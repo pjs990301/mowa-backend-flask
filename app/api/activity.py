@@ -7,6 +7,7 @@ from app.models import activity_model
 from app.databases import db, cursor
 
 import pymysql
+from datetime import date
 
 activity_ns = Namespace('Activity', description='활동 통계 관련 기능', doc='/activity', path='/activity')
 
@@ -116,7 +117,7 @@ class ActivityUserResource(Resource):
 
 
 @activity_ns.route('/<string:user_email>/stats/<int:year>/<int:month>')
-class ActivityUserStatsResource(Resource):
+class ActivityUserStatsResource1(Resource):
     def get(self, user_email, year, month):
         """
             특정 이메일과 년월을 통해 유저 활동 통계 조회
@@ -131,6 +132,43 @@ class ActivityUserStatsResource(Resource):
                      "GROUP BY YEAR(date), MONTH(date), email")
 
             cursor.execute(query, (user_email, year, month))
+            activitys = cursor.fetchone()
+            if activitys:
+                activity_stats = {
+                    'email': activitys[2],
+                    'warning_count': int(activitys[3]),
+                    'activity_count': int(activitys[4]),
+                    'fall_count': int(activitys[5])
+                }
+                return {'activity_stats': activity_stats}, 200
+
+            else:
+                return {'message': 'Activitys not found.'}, 404
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+
+@activity_ns.route(
+    '/<string:user_email>/stats/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>')
+class ActivityUserStatsResource2(Resource):
+    def get(self, user_email, start_year, start_month, start_day, end_year, end_month, end_day):
+        """
+            특정 이메일과 시작 날짜 및 끝 날짜를 통해 유저 활동 통계 조회
+        """
+        try:
+            start_date = date(start_year, start_month, start_day)
+            end_date = date(end_year, end_month, end_day)
+
+            query = ("SELECT YEAR(date) AS year, MONTH(date) AS month, email, "
+                     "SUM(warning_count) AS warning_count, "
+                     "SUM(activity_count) AS activity_count, "
+                     "SUM(fall_count) AS fall_count "
+                     "FROM activity "
+                     "WHERE email = %s AND date BETWEEN %s AND %s "
+                     "GROUP BY YEAR(date), MONTH(date), email")
+
+            cursor.execute(query, (user_email, start_date, end_date))
             activitys = cursor.fetchone()
             if activitys:
                 activity_stats = {
@@ -280,6 +318,33 @@ class ActivityDetailResource2(Resource):
                 }
                 activity_list.append(activity_dict)
             return {'activitys': activity_list}, 200
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+
+@activity_ns.route('/fall/<string:user_email>/<int:year>/<int:month>/<int:day>')
+class ActivityFallDetectionResource(Resource):
+    def put(self, user_email, year, month, day):
+        """
+            Fall 감지시 특정 이메일과 년월일을 통해서 Fall count 수정
+        """
+        try:
+            query = ("SELECT fall_count FROM activity "
+                     "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
+            cursor.execute(query, (user_email, year, month, day))
+            result = cursor.fetchone()
+
+            if not result:
+                return {"message": "No activity data found for the given email and date."}, 404
+
+            new_fall_count = result[0] + 1
+
+            update_query = ("UPDATE activity SET fall_count = %s "
+                            "WHERE email = %s AND YEAR(date) = %s AND MONTH(date) = %s AND DAY(date) = %s")
+            cursor.execute(update_query, (new_fall_count, user_email, year, month, day))
+            db.commit()
+            return {"message": "Fall count updated successfully."}, 200
 
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500

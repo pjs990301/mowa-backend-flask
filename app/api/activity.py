@@ -161,7 +161,7 @@ class ActivityUserStatsResource2(Resource):
             start_date = date(start_year, start_month, start_day)
             end_date = date(end_year, end_month, end_day)
 
-            query = ("SELECT email, YEAR(date) AS year, MONTH(date) AS month "
+            query = ("SELECT email, YEAR(date) AS year, MONTH(date) AS month, "
                      "SUM(warning_count) AS warning_count, "
                      "SUM(activity_count) AS activity_count, "
                      "SUM(fall_count) AS fall_count "

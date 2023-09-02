@@ -17,7 +17,7 @@ sidebar_layout = html.Div(
             [
                 dbc.NavLink("Home", href="/", active="exact"),
                 dbc.NavLink("User", href="/user", active="exact"),
-                dbc.NavLink("Chart", href="/Chart", active="exact"),
+                dbc.NavLink("Statistics/Chart", href="/statistics", active="exact"),
             ],
             vertical=True,
             pills=True,

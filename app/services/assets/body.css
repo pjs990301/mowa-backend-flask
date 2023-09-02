@@ -25,12 +25,11 @@
     margin-right: 5px;
 }
 
-.SingleDatePickerInput__withBorder, input[type="text"], input[type="number"]{
+.DateRangePickerInput__withBorder, input[type="text"], input[type="number"] {
     border: none;
 }
 
-#component-start-date-picker .DateInput_input,
-#component-end-date-picker .DateInput_input,
+#component-statistics-date-picker-range .DateInput_input,
 .form-control, .filter-text {
     font-family: 'Work Sans', sans-serif;
     font-style: normal;
@@ -41,22 +40,23 @@
     text-align: center;
 }
 
-#update-button-2, #update-button-3 {
+#user-update-button-2, #user-update-button-3,
+#statistics-update-button-1, #statistics-update-button-2 {
     height: 50px;
     display: flex;
 }
 
-#update-button-2 div, #update-button-3 div {
+#user-update-button-2 div, #user-update-button-3 div,
+#statistics-update-button-1 div, #statistics-update-button-2 div {
     align-items: center;
     justify-content: center;
     display: flex;
 }
 
-#component-start-date-picker .DateInput_input__focused
-#component-end-date-picker .DateInput_input__focused {
-    border-bottom : 2px solid #0AA66D
+#component-statistics-date-picker-range .DateInput_input__focused {
+    border-bottom: 2px solid #0AA66D
 }
 
 .tab-content {
-    margin : 20px
+    margin: 20px
 }

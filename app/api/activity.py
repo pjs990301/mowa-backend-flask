@@ -70,7 +70,7 @@ class ActivityResource(Resource):
             fetch_id_query = "SELECT id FROM users WHERE email = %s"
             cursor.execute(fetch_id_query, (email,))
             user_id_result = cursor.fetchone()
-
+            cursor.fetchall()
             # Check if user exists with the given email
             if not user_id_result:
                 return {"message": "User not found with the provided email."}, 404
@@ -133,6 +133,7 @@ class ActivityUserStatsResource1(Resource):
 
             cursor.execute(query, (user_email, year, month))
             activitys = cursor.fetchone()
+            cursor.fetchall()
             if activitys:
                 activity_stats = {
                     'email': activitys[2],
@@ -170,6 +171,7 @@ class ActivityUserStatsResource2(Resource):
 
             cursor.execute(query, (user_email, start_date, end_date))
             activitys = cursor.fetchone()
+            cursor.fetchall()
             if activitys:
                 activity_stats = {
                     'email': activitys[2],
@@ -196,11 +198,13 @@ class ActivityCheckResource(Resource):
             query = "SELECT * FROM activity WHERE email = %s AND date = %s"
             cursor.execute(query, (user_email, datetime.now().date()))
             existing_entry = cursor.fetchone()
+            cursor.fetchall()
 
             if not existing_entry:
                 fetch_id_query = "SELECT id FROM users WHERE email = %s"
                 cursor.execute(fetch_id_query, (user_email,))
                 user_id_result = cursor.fetchone()
+                cursor.fetchall()
 
                 # Check if user exists with the given email
                 if not user_id_result:
@@ -232,6 +236,8 @@ class ActivityDetailResource1(Resource):
                      "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
             cursor.execute(query, (user_email, year, month, day))
             activity = cursor.fetchone()
+            cursor.fetchall()
+
             if activity:
                 activity_stats = {
                     'warning_count': int(activity[0]),
@@ -334,6 +340,7 @@ class ActivityFallDetectionResource(Resource):
                      "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
             cursor.execute(query, (user_email, year, month, day))
             result = cursor.fetchone()
+            cursor.fetchall()
 
             if not result:
                 return {"message": "No activity data found for the given email and date."}, 404

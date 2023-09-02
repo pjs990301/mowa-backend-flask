@@ -47,6 +47,7 @@ class SignupResource(Resource):
             user_query = "SELECT id FROM users WHERE email = %s"
             cursor.execute(user_query, (email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 return {'message': 'User with this email already exists'}, 400
@@ -89,6 +90,8 @@ class LoginResource(Resource):
             query = "SELECT * FROM users WHERE email = %s"
             cursor.execute(query, (email,))
             user = cursor.fetchone()
+            cursor.fetchall()
+
             if user[2] != password:
                 return {'message': 'Bad credentials'}, 401
             elif not user:
@@ -143,6 +146,7 @@ class UserResource(Resource):
             query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(query, (user_email,))
             user = cursor.fetchone()
+            cursor.fetchall()
 
             if user:
                 user_dict = {
@@ -179,6 +183,7 @@ class UserResource(Resource):
             user_query = "SELECT id FROM users WHERE email = %s"
             cursor.execute(user_query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if new_email == user_email:
                 return {'message': 'User can not change email address'}, 400
@@ -206,6 +211,7 @@ class UserResource(Resource):
             query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 user = {
@@ -244,6 +250,7 @@ class ProfileResource(Resource):
             user_query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(user_query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 user = {
@@ -255,6 +262,7 @@ class ProfileResource(Resource):
                 profile_query = "SELECT id, email, src FROM profile WHERE email = %s"
                 cursor.execute(profile_query, (user['email'],))
                 profile = cursor.fetchone()
+                cursor.fetchall()
 
                 if profile:
                     return send_file(profile[2], mimetype='image/jpeg'), 200
@@ -279,6 +287,7 @@ class ProfileResource(Resource):
             user_query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(user_query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 user = {
@@ -289,6 +298,8 @@ class ProfileResource(Resource):
                 profile_query = "SELECT id FROM profile WHERE email = %s"
                 cursor.execute(profile_query, (user['email'],))
                 profile = cursor.fetchone()
+                cursor.fetchall()
+
                 if profile:
                     return {'message': 'User profile with this email already exists'}, 400
 
@@ -328,6 +339,7 @@ class ProfileResource(Resource):
             user_query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(user_query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 user = {
@@ -366,6 +378,7 @@ class ProfileResource(Resource):
             user_query = "SELECT id, name, email FROM users WHERE email = %s"
             cursor.execute(user_query, (user_email,))
             existing_user = cursor.fetchone()
+            cursor.fetchall()
 
             if existing_user:
                 user = {
@@ -377,6 +390,7 @@ class ProfileResource(Resource):
                 profile_query = "SELECT id, email, src FROM profile WHERE email = %s"
                 cursor.execute(profile_query, (user['email'],))
                 profile = cursor.fetchone()
+                cursor.fetchall()
 
                 if profile:
                     remove_img_query = "UPDATE profile SET src = NULL WHERE email = %s"

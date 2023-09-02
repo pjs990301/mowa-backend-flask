@@ -134,6 +134,7 @@ class ActivityUserStatsResource1(Resource):
             cursor.execute(query, (user_email, year, month))
             activitys = cursor.fetchone()
             cursor.fetchall()
+
             if activitys:
                 activity_stats = {
                     'email': activitys[2],
@@ -170,18 +171,27 @@ class ActivityUserStatsResource2(Resource):
                      "GROUP BY YEAR(date), MONTH(date), email")
 
             cursor.execute(query, (user_email, start_date, end_date))
-            activitys = cursor.fetchone()
-            cursor.fetchall()
+            activitys = cursor.fetchall()
+
+            if not activitys:
+                return {"message": "No activities found for the given email."}, 404
+
+            activity_list = []
+
             if activitys:
-                activity_stats = {
-                    'email': activitys[0],
-                    'year': activitys[1],
-                    'month': activitys[2],
-                    'warning_count': int(activitys[3]),
-                    'activity_count': int(activitys[4]),
-                    'fall_count': int(activitys[5])
-                }
-                return {'activity_stats': activity_stats}, 200
+
+                for activity in activitys:
+                    activity_stat = {
+                        'email': activity[0],
+                        'year': activity[1],
+                        'month': activity[2],
+                        'warning_count': int(activity[3]),
+                        'activity_count': int(activity[4]),
+                        'fall_count': int(activity[5])
+                    }
+                    activity_list.append(activity_stat)
+
+                return {'activity_stats': activity_list}, 200
 
             else:
                 return {'message': 'Activitys not found.'}, 404

@@ -1,0 +1,62 @@
+.CONTENT_STYLE {
+    margin-left: 18rem;
+    margin-right: 2rem;
+    padding: 2rem 1rem;
+}
+
+.filter-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 7px;
+
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 50px;
+}
+
+.filter-img {
+    height: 17px;
+    width: 17px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.SingleDatePickerInput__withBorder, input[type="text"], input[type="number"]{
+    border: none;
+}
+
+#component-start-date-picker .DateInput_input,
+#component-end-date-picker .DateInput_input,
+.form-control, .filter-text {
+    font-family: 'Work Sans', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+
+    padding: 6px 12px;
+    text-align: center;
+}
+
+#update-button-2, #update-button-3 {
+    height: 50px;
+    display: flex;
+}
+
+#update-button-2 div, #update-button-3 div {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+#component-start-date-picker .DateInput_input__focused
+#component-end-date-picker .DateInput_input__focused {
+    border-bottom : 2px solid #0AA66D
+}
+
+.tab-content {
+    margin : 20px
+}

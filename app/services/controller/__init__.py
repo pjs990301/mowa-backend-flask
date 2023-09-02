@@ -1,1 +1,1 @@
-from .control import controls_card
+from .callback import register_callbacks

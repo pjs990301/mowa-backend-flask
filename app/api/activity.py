@@ -261,7 +261,7 @@ class ActivityDetailResource2(Resource):
             특정 이메일과 년월을 통해서 활동 조회
         """
         try:
-            query = ("SELECT warning_count, activity_count, fall_count FROM activity "
+            query = ("SELECT date, warning_count, activity_count, fall_count FROM activity "
                      "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s")
             cursor.execute(query, (user_email, year, month))
             activitys = cursor.fetchall()
@@ -273,9 +273,10 @@ class ActivityDetailResource2(Resource):
 
             for activity in activitys:
                 activity_dict = {
-                    'warning_count': activity[0],
-                    'activity_count': activity[1],
-                    'fall_count': activity[2],
+                    'date': activity[0].strftime('%Y-%m-%d'),
+                    'warning_count': activity[1],
+                    'activity_count': activity[2],
+                    'fall_count': activity[3],
                 }
                 activity_list.append(activity_dict)
             return {'activitys': activity_list}, 200

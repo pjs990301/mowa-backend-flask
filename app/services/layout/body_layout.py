@@ -4,11 +4,9 @@ import dash_bootstrap_components as dbc
 # from app.services.layout.tab.user_tab import tab2_filter_layout, tab3_filter_layout
 from .tab.user_tab import *
 from .tab.statistics_tab import *
-Home_layout = dbc.Container([
-
-])
 
 User_layout = dbc.Container([
+    dcc.Location(id='url-refresh', refresh=True),
     dcc.Store(id='user-store-data', storage_type='session'),
     dbc.Tabs(
         [
@@ -19,7 +17,8 @@ User_layout = dbc.Container([
         id="user-tabs",
         active_tab="user-tab-1",
     ),
-    html.Div(id="user-tabs-content")
+    html.Div(id="user-tabs-content"),
+    user_tab1_filter_layout
 ])
 
 Statistics_layout = dbc.Container([

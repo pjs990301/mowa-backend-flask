@@ -5,19 +5,22 @@ import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
 
-
 sidebar_layout = html.Div(
     [
-        html.H2("Sidebar", className="display-4"),
+        html.H2("Memu", className="Side-bar-title"),
         html.Hr(),
-        html.P(
-            "Number of students per education level", className="lead"
-        ),
         dbc.Nav(
             [
-                dbc.NavLink("Home", href="/", active="exact"),
-                dbc.NavLink("User", href="/user", active="exact"),
-                dbc.NavLink("Statistics/Chart", href="/statistics", active="exact"),
+                dbc.NavLink([
+                    html.Img(src="/assets/img/user_black.png", id="user-image",
+                             style={'height': '20px', 'width': '20px', 'margin-right': '10px'}),
+                    "User"
+                ], href="/", active="exact"),
+                dbc.NavLink([
+                    html.Img(src="/assets/img/chart_black.png", id="chart-image",
+                             style={'height': '20px', 'width': '20px', 'margin-right': '10px'}),
+                    "Statistics / Chart"
+                ], href="/statistics", active="exact"),
             ],
             vertical=True,
             pills=True,

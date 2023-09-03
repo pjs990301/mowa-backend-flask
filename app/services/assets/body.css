@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@600&display=swap');
+
+body {
+    overflow-x: hidden;
+}
+
+
 .CONTENT_STYLE {
     margin-left: 18rem;
     margin-right: 2rem;
@@ -25,12 +33,31 @@
     margin-right: 5px;
 }
 
-.DateRangePickerInput__withBorder, input[type="text"], input[type="number"] {
-    border: none;
+#user-modify-button div img {
+    height: 17px;
+    width: 17px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#user-modify-button {
+    width: 100%;
+    margin-top: 20px;
+    height: 50px;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+#user-modify-button div {
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 #component-statistics-date-picker-range .DateInput_input,
-.form-control, .filter-text {
+.form-control, .filter-text, table, .modal-content {
     font-family: 'Work Sans', sans-serif;
     font-style: normal;
     font-weight: 500;
@@ -38,6 +65,15 @@
 
     padding: 6px 12px;
     text-align: center;
+}
+
+.nav-item {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+
 }
 
 #user-update-button-2, #user-update-button-3,
@@ -59,4 +95,16 @@
 
 .tab-content {
     margin: 20px
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: #0AA66D
+}
+
+.nav-link:focus, .nav-link:hover, .nav-link {
+    color: black;
+}
+
+.DateRangePickerInput__withBorder, .filter-content input[type="text"], .filter-content input[type="number"] {
+    border: none;
 }

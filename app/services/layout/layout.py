@@ -1,5 +1,6 @@
 from flask import Flask
 from dash import Dash, dcc, html
+
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
@@ -17,5 +18,3 @@ main_layout = html.Div([
     top_layout,
     body_layout
 ])
-
-

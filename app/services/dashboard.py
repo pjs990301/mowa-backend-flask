@@ -14,6 +14,7 @@ dash = Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP,
             suppress_callback_exceptions=True)
 
 dash.layout = main_layout
+dash.title = "MoWA Data Dashboard"
 register_callbacks(dash)
 
 # Run the app

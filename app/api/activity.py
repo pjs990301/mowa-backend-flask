@@ -367,3 +367,57 @@ class ActivityFallDetectionResource(Resource):
 
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500
+
+@activity_ns.route('/activity/<string:user_email>/<int:year>/<int:month>/<int:day>')
+class ActivityActivityDetectionResource(Resource):
+    def put(self, user_email, year, month, day):
+        """
+            Activity 감지시 특정 이메일과 년월일을 통해서 Activity count 수정
+        """
+        try:
+            query = ("SELECT activity_count FROM activity "
+                     "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
+            cursor.execute(query, (user_email, year, month, day))
+            result = cursor.fetchone()
+            cursor.fetchall()
+
+            if not result:
+                return {"message": "No activity data found for the given email and date."}, 404
+
+            new_activity_count = result[0] + 1
+
+            update_query = ("UPDATE activity SET activity_count = %s "
+                            "WHERE email = %s AND YEAR(date) = %s AND MONTH(date) = %s AND DAY(date) = %s")
+            cursor.execute(update_query, (new_activity_count, user_email, year, month, day))
+            db.commit()
+            return {"message": "Activity count updated successfully."}, 200
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+@activity_ns.route('/warning/<string:user_email>/<int:year>/<int:month>/<int:day>')
+class ActivityWarningDetectionResource(Resource):
+    def put(self, user_email, year, month, day):
+        """
+            Warning 감지시 특정 이메일과 년월일을 통해서 warning count 수정
+        """
+        try:
+            query = ("SELECT warning_count FROM activity "
+                     "WHERE email = %s AND YEAR(date)=%s AND MONTH(date)=%s AND DAY(date)=%s")
+            cursor.execute(query, (user_email, year, month, day))
+            result = cursor.fetchone()
+            cursor.fetchall()
+
+            if not result:
+                return {"message": "No activity data found for the given email and date."}, 404
+
+            new_warning_count = result[0] + 1
+
+            update_query = ("UPDATE activity SET warning_count = %s "
+                            "WHERE email = %s AND YEAR(date) = %s AND MONTH(date) = %s AND DAY(date) = %s")
+            cursor.execute(update_query, (new_warning_count, user_email, year, month, day))
+            db.commit()
+            return {"message": "Fall count updated successfully."}, 200
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500

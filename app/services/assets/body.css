@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@600&display=swap');
+
+body {
+    overflow-x: hidden;
+}
+
+
+.CONTENT_STYLE {
+    margin-left: 18rem;
+    margin-right: 2rem;
+    padding: 2rem 1rem;
+}
+
+.filter-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 7px;
+
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 50px;
+}
+
+.filter-img {
+    height: 17px;
+    width: 17px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#user-modify-button div img {
+    height: 17px;
+    width: 17px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#user-modify-button {
+    width: 100%;
+    margin-top: 20px;
+    height: 50px;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+#user-modify-button div {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+#component-statistics-date-picker-range .DateInput_input,
+.form-control, .filter-text, table, .modal-content {
+    font-family: 'Work Sans', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+
+    padding: 6px 12px;
+    text-align: center;
+}
+
+.nav-item {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+
+}
+
+#user-update-button-2, #user-update-button-3,
+#statistics-update-button-1, #statistics-update-button-2 {
+    height: 50px;
+    display: flex;
+}
+
+#user-update-button-2 div, #user-update-button-3 div,
+#statistics-update-button-1 div, #statistics-update-button-2 div {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+#component-statistics-date-picker-range .DateInput_input__focused {
+    border-bottom: 2px solid #0AA66D
+}
+
+.tab-content {
+    margin: 20px
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: #0AA66D
+}
+
+.nav-link:focus, .nav-link:hover, .nav-link {
+    color: black;
+}
+
+.DateRangePickerInput__withBorder, .filter-content input[type="text"], .filter-content input[type="number"] {
+    border: none;
+}

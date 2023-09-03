@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@600&display=swap');
+
+.SIDEBAR_STYLE {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+}
+
+.Side-bar-title{
+    font-family: 'Work Sans', sans-serif;
+    font-weight: Bold;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    background-color : #0AA66D
+}
+
+.flex-column.nav.nav-pills a{
+    font-family: 'Work Sans', sans-serif;
+}
+
+.flex-column.nav.nav-pills a.nav-link{
+    color: #A6ABC8;
+}
+.flex-column.nav.nav-pills a.nav-link.active{
+    color: #FFFFFF;}

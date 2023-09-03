@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap');
+
+
+#Top-Head {
+    font-family: 'Work Sans', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 40px;
+
+    /* identical to box height */
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.02em;
+    color: #0AA66D;
+}

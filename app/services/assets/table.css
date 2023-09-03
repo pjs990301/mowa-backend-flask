@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@600&display=swap');
+
+.dash-spreadsheet {
+    /*border: 1px solid lightgrey;*/
+}
+
+.dash-spreadsheet th {
+    text-align: center !important;
+    height: 41px;
+    font-family: 'Work Sans', sans-serif;
+}
+
+.dash-spreadsheet td {
+    text-align: center !important;
+    padding: 10px;
+    height: 41px;
+    font-family: 'Work Sans', sans-serif;
+}
+
+.expanded-row--empty-cell.dash-select-header {
+    width: 80px !important;
+    max-width: 80px !important;
+}

@@ -1,0 +1,5 @@
+{
+  "JWT" : {
+    "JWT_SECRET_KEY": ""
+  }
+}

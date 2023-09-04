@@ -146,11 +146,23 @@ The project provides MoWA back-end framework and front-end framework services
    > If you are going to use the dashboard, you should change to `server IP and server port`.
 ## Demo
 ### Back-end (Flask)
-
-
+1. User API
+![swagger_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_1.png?raw=true)
+2. Activity API
+![swagger_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_2.png?raw=true)
+3. Model
+![swagger_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_3.png?raw=true)
 
 ### Front-end (Dash)
+1. User Management
+![dashboard_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_1.png?raw=true)
+![dashboard_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_2.png?raw=true)
+![dashboard_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_3.png?raw=true)
+![dashboard_4.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_4.png?raw=true)
 
+2. User Statistics
+![dashboard_5.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_5.png?raw=true)
+![dashboard_6.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_6.png?raw=true)
 
 ## License
 

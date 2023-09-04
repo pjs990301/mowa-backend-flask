@@ -1,0 +1,147 @@
+# mowa-backend-flask
+
+The project provides MoWA back-end framework and front-end framework services
+
+## Content
+
+<!-- TOC -->
+
+* [Getting Started](#getting-started)
+    * [Installing](#installing)
+* [Usage](#usage)
+    * [Execution Program](#execution-program)
+    * [Configuration](#configuration)
+* [Demo](#demo)
+* [License](#license)
+
+<!-- TOC -->
+
+## Getting Started
+
+### Installing
+
+1. Clone the project repository
+
+    ```sh
+    git https://github.com/oss-inc/mowa-backend-flask
+    ```
+
+2. Python Virtual Environment Setup
+
+    ```sh
+    conda create -n mowa-backend-flask python=3.8
+    ```
+
+3. Installing the Flask Server
+
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+### Execution Program
+
+1. Run `app.py` for Flask Server(Back-end)
+
+    ```sh
+    python -m flask run 
+    ```
+
+2. Run `app.services.dashboard.py` for Management page (Front-end)
+
+    ```sh
+    python -m app.services.dashboard run
+    ```
+
+### Configuration
+
+1. Database setting with `app/databases/db_info.json`
+
+    ```json
+    {
+      "Database": {
+        "host": "DATABASE_IP",
+        "user": "USER_NAME",
+        "password": "USER_PASSWORD!",
+        "database": "DATABASE_NAME"
+      }
+    }
+    ```
+
+2. Server Host and Port setting in `__init__.py`
+
+    ```python
+    if __name__ == '__main__':
+        app.run(debug=True, host='0.0.0.0', port=8000)
+    ```
+    > You can change host IP and port number<br> The IP default is `0.0.0.0` and the port default is `8000`.
+
+3. Web page Host and Port setting in `app.services.dashboard.py`
+    
+    ```python
+    if __name__ == '__main__':
+        server.run(debug=True, host="0.0.0.0", port=8050)
+    ```
+    > You can change host IP and port number<br> The IP default is `0.0.0.0` and the port default is `8050`.
+
+4. Database setting with mysql query
+    <details>
+    <summary>SQL Code </summary>
+    <div markdown="1">
+    
+    ```sql
+    create table users
+    (
+        id       int auto_increment
+            primary key,
+        name     varchar(255) not null,
+        email    varchar(255) not null,
+        password varchar(255) not null,
+        constraint email
+            unique (email)
+    );
+    
+    create table activity
+    (
+        id             int          not null,
+        email          varchar(255) not null,
+        date           date         not null,
+        warning_count  int          null,
+        activity_count int          null,
+        fall_count     int          null,
+        primary key (id, date, email),
+        constraint activity_ibfk_1
+            foreign key (id) references users (id)
+                on update cascade on delete cascade,
+        constraint activity_ibfk_2
+            foreign key (email) references users (email)
+                on update cascade on delete cascade
+    );
+    
+    create table profile
+    (
+        id    int          not null
+            primary key,
+        email varchar(255) null,
+        src   varchar(255) null,
+        constraint profile_ibfk_1
+            foreign key (id) references users (id)
+                on update cascade on delete cascade,
+        constraint profile_ibfk_2
+            foreign key (email) references users (email)
+                on update cascade on delete cascade
+    );
+    ```
+    </div>
+    </details>
+
+## Demo
+
+
+## License
+
+This project is licensed under the MIT License - see
+the [LICENSE.md](https://github.com/oss-inc/mowa-backend-flask/blob/develop/LICENSE) file for details
+
+

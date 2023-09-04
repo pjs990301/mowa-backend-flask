@@ -18,4 +18,4 @@ api.add_namespace(user_ns)
 api.add_namespace(activity_ns)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0',port=8000)
+    app.run(host='0.0.0.0', port=8000)

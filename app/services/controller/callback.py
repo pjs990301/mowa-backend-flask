@@ -65,17 +65,17 @@ def register_callbacks(dash_app):
                    month_tab2, month_tab3,
                    day_tab3):
         if tab == 'user-tab-1':
-            response = requests.get("http://127.0.0.1:5000/user/users")
+            response = requests.get("http://192.9.200.45:8000/user/users")
             return response.json()
 
         if tab == 'user-tab-2' and n_clicks_2:
-            url = f"http://127.0.0.1:5000/activity/{user_email_tab2}/{year_tab2}/{month_tab2}"
+            url = f"http://192.9.200.45:8000/activity/{user_email_tab2}/{year_tab2}/{month_tab2}"
             response = requests.get(url)
             # print(response.json())
             return response.json()
 
         if tab == 'user-tab-3' and n_clicks_3:
-            url = f"http://127.0.0.1:5000/activity/{user_email_tab3}/{year_tab3}/{month_tab3}/{day_tab3}"
+            url = f"http://192.9.200.45:8000/activity/{user_email_tab3}/{year_tab3}/{month_tab3}/{day_tab3}"
             response = requests.get(url)
             # print(response.json())
             return response.json()
@@ -181,7 +181,7 @@ def register_callbacks(dash_app):
         # print("send_request callback triggered")
         # print(selected_data)
         if not is_open and n and n > 0:
-            url = f"http://127.0.0.1:5000/user/{selected_data['EMAIL']}"
+            url = f"http://192.9.200.45:8000/user/{selected_data['EMAIL']}"
 
             # 데이터 준비
             data = {
@@ -214,7 +214,7 @@ def register_callbacks(dash_app):
     def fetch_statistics_data(tab, n_clicks_1, n_clicks_2, user_email_tab1, year_tab1, month_tab1, user_email_tab2,
                               start_date, end_date):
         if tab == 'statistics-tab-1' and n_clicks_1:
-            url = f"http://127.0.0.1:5000/activity/{user_email_tab1}/stats/{year_tab1}/{month_tab1}"
+            url = f"http://192.9.200.45:8000/activity/{user_email_tab1}/stats/{year_tab1}/{month_tab1}"
             response = requests.get(url)
             # print(response.json())
             return response.json()
@@ -222,7 +222,7 @@ def register_callbacks(dash_app):
         if tab == 'statistics-tab-2' and n_clicks_2:
             date_obj1 = datetime.strptime(start_date, '%Y-%m-%d')
             date_obj2 = datetime.strptime(end_date, '%Y-%m-%d')
-            url = f"http://127.0.0.1:5000/activity/{user_email_tab2}/stats/{date_obj1.year}/{date_obj1.month}/{date_obj1.day}/{date_obj2.year}/{date_obj2.month}/{date_obj2.day}"
+            url = f"http://192.9.200.45:8000/activity/{user_email_tab2}/stats/{date_obj1.year}/{date_obj1.month}/{date_obj1.day}/{date_obj2.year}/{date_obj2.month}/{date_obj2.day}"
             response = requests.get(url)
             # print(response.json())
             return response.json()

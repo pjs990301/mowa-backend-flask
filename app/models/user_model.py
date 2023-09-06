@@ -5,3 +5,8 @@ user_model = {
     'email': fields.String(required=True, description='Email'),
     'password': fields.String(required=True, description='Password'),
 }
+
+login_model = {
+    'email': fields.String(required=True, description='Email'),
+    'password': fields.String(required=True, description='Password'),
+}

@@ -1,14 +1,18 @@
+import time
+from datetime import datetime, timezone
+from random import randint
+
+from flask_mail import Message
 from flask_restx import Resource, Namespace, reqparse
-from flask import request, send_file
+from flask import request, send_file, session
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token
 
 import os
 import shutil
 
-from app import api
-from app.models import user_model
+from app.models import *
 from app.databases import db, cursor
 
 import pymysql
@@ -17,6 +21,7 @@ import pymysql
 user_ns = Namespace('User', description='사용자 관련 기능', doc='/user', path='/user')
 
 user_field = user_ns.model('UserModel', user_model)
+login_field = user_ns.model('LoginModel', login_model)
 
 user_file_parser = reqparse.RequestParser()
 user_file_parser.add_argument('profile_image', type=FileStorage, location='files')
@@ -69,7 +74,7 @@ class SignupResource(Resource):
 
 @user_ns.route('/login')
 class LoginResource(Resource):
-    @user_ns.expect(user_field, validate=True)
+    @user_ns.expect(login_field, validate=True)
     def post(self):
         """
             유저 로그인
@@ -92,7 +97,7 @@ class LoginResource(Resource):
             user = cursor.fetchone()
             cursor.fetchall()
 
-            if user[2] != password:
+            if user[3] != password:
                 return {'message': 'Bad credentials'}, 401
             elif not user:
                 return {'message': 'User not found'}, 404
@@ -405,3 +410,143 @@ class ProfileResource(Resource):
                 return {'message': 'User not found'}, 404
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500
+
+
+@user_ns.route('/emails')
+class SendEmailUsingSMTP(Resource):
+    def post(self):
+        """
+            특정 이메일을 통해 유저 이메일 인증
+        """
+        email_address = request.get_json(force=True)['email']
+        otp_create_time = datetime.now()
+
+        try:
+            otp = generate_otp(email_address, otp_create_time)
+            result = send_mail(email_address, otp)
+
+            if result['statusCode'] == '202':
+                return {'message': 'Email sent successfully'}, 200
+            else:
+                return {'message': 'Email sent failed'}, 400
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+
+@user_ns.route('/emails/verifications')
+class VerifyEmailUsingSMTP(Resource):
+    def post(self):
+        email = request.get_json(force=True)['email']
+        otp = request.get_json(force=True)['otp']
+
+        session_otp = session.get(f'otp_{email}')
+        session_time = session.get(f'time_{email}')
+
+        if not session_otp or not session_time:
+            return {'message': 'OTP not found'}, 404
+
+        current_time = datetime.now(timezone.utc)
+
+        if (current_time - session_time).total_seconds() > 180:
+            session.pop(f'otp_{email}')
+            session.pop(f'time_{email}')
+            return {'message': 'OTP expired'}, 400
+
+        if str(otp) == session_otp:
+            session.pop(f'otp_{email}')
+            session.pop(f'time_{email}')
+            return {'message': 'OTP verified successfully'}, 200
+
+
+@user_ns.route('/passwords')
+class SendEmailForChangingPasswordUsingSMTP(Resource):
+    def post(self):
+        """
+            특정 이메일을 통해 비밀번호 변경 인증
+        """
+        email_address = request.get_json(force=True)['email']
+        otp_create_time = datetime.now()
+
+        try:
+            otp = generate_otp(email_address, otp_create_time)
+            result = send_mail(email_address, otp)
+
+            if result['statusCode'] == '202':
+                return {'message': 'Email sent successfully'}, 200
+            else:
+                return {'message': 'Email sent failed'}, 400
+
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+    def patch(self):
+        email_address = request.get_json(force=True)['email']
+        new_password = request.get_json(force=True)['password']
+
+        try:
+            # Check if user with given email already exists
+            user_query = "SELECT id FROM users WHERE email = %s"
+            cursor.execute(user_query, (email_address,))
+            existing_user = cursor.fetchone()
+            cursor.fetchall()
+
+            if existing_user:
+                # 사용자 정보 업데이트
+                update_query = "UPDATE users SET password = %s WHERE email = %s"
+                update_values = (new_password, email_address)
+
+                cursor.execute(update_query, update_values)
+                db.commit()
+
+                return {'message': 'User password updated successfully'}, 200
+            else:
+                return {'message': 'User not found'}, 404
+        except pymysql.Error as e:
+            return {"message": "Database error: {}".format(e)}, 500
+
+
+@user_ns.route('/passwords/verifications')
+class VerifyEmailForChaningPasswordUsingSMTP(Resource):
+    def post(self):
+        email = request.get_json(force=True)['email']
+        otp = request.get_json(force=True)['otp']
+
+        session_otp = session.get(f'otp_{email}')
+        session_time = session.get(f'time_{email}')
+
+        if not session_otp or not session_time:
+            return {'message': 'OTP not found'}, 404
+
+        current_time = datetime.now(timezone.utc)
+
+        if (current_time - session_time).total_seconds() > 180:
+            session.pop(f'otp_{email}')
+            session.pop(f'time_{email}')
+            return {'message': 'OTP expired'}, 400
+
+        if str(otp) == session_otp:
+            session.pop(f'otp_{email}')
+            session.pop(f'time_{email}')
+            return {'message': 'OTP verified successfully'}, 200
+
+
+def send_mail(email, otp):
+    import app
+    mail = app.mail
+
+    cert_info = {'email': email}
+    email_address = cert_info['email']
+
+    msg = Message("[MoWA] 이메일 인증번호", sender=app.config.smtp_info['MAIL_USERNAME'], recipients=[email_address])
+    msg.body = '\n인증번호 : {}'.format(otp)
+    mail.send(msg)
+    response = {'statusCode': '202', 'statusName': 'success'}
+    return response
+
+
+def generate_otp(email_address, otp_create_time):
+    otp = str(randint(100000, 999999))
+    session[f'otp_{email_address}'] = otp
+    session[f'time_{email_address}'] = otp_create_time
+    return otp

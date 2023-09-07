@@ -152,11 +152,11 @@ The project provides MoWA back-end framework and front-end framework services
 ## Demo
 ### Back-end (Flask)
 #### 1. User API
-![swagger_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_1.png?raw=true)
+![swagger_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_1.png?raw=true)
 #### 2. Activity API
-![swagger_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_2.png?raw=true)
+![swagger_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_3.png?raw=true)
 #### 3. Model
-![swagger_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/swagger_3.png?raw=true)
+![swagger_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_2.png?raw=true)
 
 ### Front-end (Dash)
 #### 1. User Management

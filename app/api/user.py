@@ -92,7 +92,7 @@ class LoginResource(Resource):
             user = cursor.fetchone()
             cursor.fetchall()
 
-            if user[2] != password:
+            if user[3] != password:
                 return {'message': 'Bad credentials'}, 401
             elif not user:
                 return {'message': 'User not found'}, 404

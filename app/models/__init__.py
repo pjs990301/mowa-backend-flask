@@ -1,2 +1,2 @@
-from .user_model import user_model
+from .user_model import *
 from .activity_model import activity_model

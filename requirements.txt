@@ -19,3 +19,4 @@ pymysql
 dash
 dash-bootstrap-components
 pandas
+flask-mail

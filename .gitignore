@@ -5,6 +5,11 @@
 *.json
 app/profile_image/
 
+app/config/jwt_info.json
+app/config/session_info.json
+app/config/smtp_info.json
+app/databases/db_info.json
+
 ### Flask ###
 instance/*
 !instance/.gitignore
@@ -40,10 +45,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
+    # PyInstaller
+    #  Usually these files are written by a python script from a template
+    #  before PyInstaller builds the exe, so as to inject date/other infos into it.
+    *.manifest
 *.spec
 
 # Installer logs

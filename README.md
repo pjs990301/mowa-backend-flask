@@ -2,6 +2,14 @@
 
 The project provides MoWA back-end framework and front-end framework services
 
+<br/>
+
+🌎 [README.md in English](https://github.com/oss-inc/mowa-backend-flask/blob/main/README.md)  
+🇰🇷  [README.md in Korean](https://github.com/oss-inc/mowa-backend-flask/blob/main/README_KO.md)
+
+<br/>
+
+
 ## Content
 
 <!-- TOC -->

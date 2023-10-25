@@ -267,6 +267,8 @@ class ProfileResource(Resource):
                 cursor.execute(profile_query, (user['email'],))
                 profile = cursor.fetchone()
                 cursor.fetchall()
+                print(f'profile : {profile}')
+                print(f'profile : {profile[2]}')
 
                 if profile:
                     return send_file(profile[2], mimetype='image/jpeg'), 200
@@ -279,6 +281,7 @@ class ProfileResource(Resource):
 
         except pymysql.Error as e:
             return {"message": "Database error: {}".format(e)}, 500
+
 
     @user_ns.expect(user_file_parser, validate=True)
     def post(self, user_email):

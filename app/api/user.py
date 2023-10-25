@@ -246,7 +246,6 @@ class UserResource(Resource):
 
 @user_ns.route('/<string:user_email>/profile')
 class ProfileResource(Resource):
-    @user_ns.doc(security='Bearer Auth')
     def get(self, user_email):
         """
             특정 이메일을 통해 유저 프로필 이미지 조회

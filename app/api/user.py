@@ -271,7 +271,7 @@ class ProfileResource(Resource):
                 print(f'profile : {profile[2]}')
 
                 if profile:
-                    return send_file(profile[2], mimetype='image/jpeg'), 200
+                    return send_file(profile[2], mimetype='image/jpeg')
 
                 else:
                     return {'message': 'User profile image not found'}, 400

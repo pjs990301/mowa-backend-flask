@@ -1,77 +1,69 @@
 # mowa-backend-flask
 
-The project provides MoWA back-end framework and front-end framework services
+이 프로젝트는 MoWA-backend 프레임워크 및 프론트엔드 프레임워크 서비스를 제공합니다
 
-<br/>
-
-🌎 [README.md in English](https://github.com/oss-inc/mowa-backend-flask/blob/main/README.md)  
-🇰🇷  [README.md in Korean](https://github.com/oss-inc/mowa-backend-flask/blob/main/README_KO.md)
-
-<br/>
-
-
-## Content
+## 내용
 
 <!-- TOC -->
 * [mowa-backend-flask](#mowa-backend-flask)
-  * [Content](#content)
-  * [Getting Started](#getting-started)
-    * [Installing](#installing)
-  * [Usage](#usage)
-    * [Execution Program](#execution-program)
-    * [Configuration](#configuration)
+  * [내용](#내용)
+  * [시작하기](#시작하기)
+    * [설치](#설치)
+  * [사용](#사용)
+    * [프로그램 실행](#프로그램-실행)
+    * [구성](#구성)
   * [Demo](#demo)
     * [Back-end (Flask)](#back-end-flask)
-      * [1. User API](#1-user-api)
-      * [2. Activity API](#2-activity-api)
-      * [3. Model](#3-model)
+      * [1. 유저 API](#1-유저-api)
+      * [2. 활동 API](#2-활동-api)
+      * [3. 모델](#3-모델)
     * [Front-end (Dash)](#front-end-dash)
-      * [1. User Management](#1-user-management)
-      * [2. User Statistics](#2-user-statistics)
-  * [License](#license)
+      * [1. 유저 관리](#1-유저-관리)
+      * [2. 유저 통계](#2-유저-통계)
+  * [라이선스](#라이선스)
 <!-- TOC -->
 
-## Getting Started
+## 시작하기
 
-### Installing
+### 설치
 
-1. Clone the project repository
+1. project repository 복제
 
     ```sh
     git https://github.com/oss-inc/mowa-backend-flask
     ```
 
-2. Python Virtual Environment Setup
+2. Python 가상 환경 셋팅
 
     ```sh
     conda create -n mowa-backend-flask python=3.8
     ```
 
-3. Installing the Flask Server
+3. Flask 서버 설치
 
     ```sh
     pip install -r requirements.txt
     ```
 
-## Usage
+## 사용
 
-### Execution Program
+### 프로그램 실행
 
-1. Run `app.py` for Flask Server(Back-end)
+1. 플라스크 서버용 `app.py` 실행(Back-end)
 
     ```sh
     python -m flask run 
     ```
 
-2. Run `app.services.dashboard.py` for Management page (Front-end)
+2. 관리 페이지 `app.services.dashboard.py` 실행 (프론트엔드)
 
     ```sh
     python -m app.services.dashboard run
     ```
 
-### Configuration
+### 구성
 
-1. Database setting with `app/databases/db_info.json`
+1. `app/databases/db_info.json` 데이터베이스 설정
 
     ```json
     {
@@ -84,23 +76,23 @@ The project provides MoWA back-end framework and front-end framework services
     }
     ```
 
-2. Server Host and Port setting in `__init__.py`
+2. `__init_.py`의 서버 호스트 및 포트 설정
 
     ```python
     if __name__ == '__main__':
         app.run(debug=True, host='0.0.0.0', port=8000)
     ```
-    > You can change host IP and port number<br> The IP default is `0.0.0.0` and the port default is `8000`.
+    > 호스트 IP 및 포트 번호를 변경할 수 있습니다.<br> IP 기본값은 `0.0.0.0`이고 포트 기본값은 `8000`입니다.
 
-3. Web page Host and Port setting in `app.services.dashboard.py`
+3. 웹페이지 `app.services.dashboard.py`의 호스트 및 포트 설정
     
     ```python
     if __name__ == '__main__':
         server.run(debug=True, host="0.0.0.0", port=8050)
     ```
-    > You can change host IP and port number<br> The IP default is `0.0.0.0` and the port default is `8050`.
+    > 호스트 IP 및 포트 번호를 변경할 수 있습니다.<br> IP 기본값은 `0.0.0.0`이고 포트 기본값은 `8050`입니다.
 
-4. Database setting with mysql query
+4. mysql 쿼리를 사용한 데이터베이스 설정
     <details>
     <summary>SQL Code </summary>
     <div markdown="1">
@@ -150,36 +142,34 @@ The project provides MoWA back-end framework and front-end framework services
     ```
     </div>
     </details>
-5. Change Request URL in `app.services.controller.callback.py`
+5. `app.services.controller.callback.py`에서 요청 URL 변경
       ```python
       if tab == 'user-tab-1':
             response = requests.get("http://{ServerIP}:{ServerPort}/user/users")
             return response.json()
       ```
-   > If you are going to use the dashboard, you should change to `server IP and server port`.
+   > 대시보드를 사용하려면 `서버 IP 및 서버 포트`로 변경해야 합니다.
 ## Demo
 ### Back-end (Flask)
-#### 1. User API
+#### 1. 유저 API
 ![swagger_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_1.png?raw=true)
-#### 2. Activity API
+#### 2. 활동 API
 ![swagger_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_3.png?raw=true)
-#### 3. Model
+#### 3. 모델
 ![swagger_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/main/img/swagger_2.png?raw=true)
 
 ### Front-end (Dash)
-#### 1. User Management
+#### 1. 유저 관리
 ![dashboard_1.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_1.png?raw=true)
 ![dashboard_2.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_2.png?raw=true)
 ![dashboard_3.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_3.png?raw=true)
 ![dashboard_4.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_4.png?raw=true)
 
-#### 2. User Statistics
+#### 2. 유저 통계
 ![dashboard_5.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_5.png?raw=true)
 ![dashboard_6.png](https://github.com/oss-inc/mowa-backend-flask/blob/develop/img/dashboard_6.png?raw=true)
 
-## License
+## 라이선스
 
-This project is licensed under the MIT License - see
-the [LICENSE.md](https://github.com/oss-inc/mowa-backend-flask/blob/develop/LICENSE) file for details
-
+이 프로젝트는 MIT 라이센스로 라이센스가 부여됩니다. 자세한 내용은 [LICENSE.md](https://github.com/oss-inc/mowa-backend-flask/block/develop/LICENCE) 파일을 참조하십시오
 
